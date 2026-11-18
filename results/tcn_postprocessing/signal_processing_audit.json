@@ -1,0 +1,14 @@
+{
+  "join_count": {
+    "val_00": 136,
+    "val_01": 137,
+    "val_02": 129,
+    "val_03": 121,
+    "val_04": 24
+  },
+  "distinct_spans_analyzed": 122,
+  "seconds": {
+    "join_scan": 2.7971338019960967,
+    "refinement": 0.6661015479949128
+  }
+}

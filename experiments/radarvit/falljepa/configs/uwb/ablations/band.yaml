@@ -1,0 +1,9 @@
+# band: range-band gains (FilterAugment, linear type, along range): per radar 2-5 random boundaries,
+# each band at U(-3, +3) dB, interpolated; mat positions stay where they are (rshift moved them and
+# hurt). Stack on rdrop (rdrop+band). Why: the remaining misses are one subject's falls.
+run:
+  notes: "AP + range-band gains of +-3 dB (2-5 bands per radar)."
+data:
+  augment:
+    band_gain_db: 3.0
+    band_count: [2, 5]

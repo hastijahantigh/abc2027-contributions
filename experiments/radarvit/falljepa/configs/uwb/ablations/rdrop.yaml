@@ -1,0 +1,7 @@
+# rdrop: the AP base with radar dropout: in 15 % of training windows one radar's CIR and its 4
+# physics features are set to 0, so the early-fused model cannot rely on one radar.
+run:
+  notes: "AP + radar dropout 0.15 (CIR and physics features of one radar zeroed)."
+data:
+  augment:
+    radar_drop_p: 0.15

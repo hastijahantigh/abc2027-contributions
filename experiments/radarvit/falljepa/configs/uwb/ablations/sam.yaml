@@ -1,0 +1,10 @@
+# sam: sharpness-aware minimization (rho 0.05) under the same SWA, i.e. weight-averaged SAM (Kaddour
+# et al. 2022); stack on rdrop (rdrop+sam). Clipping moves into the SAM step (Lightning cannot clip a
+# manual step), so the trainer's gradient_clip_val is off. Costs a second forward/backward per step.
+run:
+  notes: "AP + SAM rho 0.05 (clip 1.0 inside the step), SWA epochs 11-30."
+trainer:
+  gradient_clip_val: null
+  gradient_clip_algorithm: null
+model:
+  sam: {rho: 0.05, clip: 1.0}

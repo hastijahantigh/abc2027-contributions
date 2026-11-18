@@ -1,0 +1,159 @@
+# RS: the recording-head model (docs/falljepa_recording_head.md), one config for the subject-held-out
+# CV (docs/stream_cv.md). It is the best AP3 recipe (AP + radar dropout + dense SWA) with three changes:
+#
+#   complex input   README v1.1: the 368 values are 184 complex bins, I block then Q block. The input
+#                   is I, Q and amplitude of the 3 radars on 184 rows, so a patch holds the I and Q of
+#                   the same bins (phase, Doppler); I and Q share one std per bin
+#   recording head  the units (source recordings between Amir's detected joins) of every window go
+#                   through a second stage that predicts P(fall in the unit) and a start and an end
+#                   distribution over the unit; it is fed the official labeller's own quantities per
+#                   unit (state against the unit's first / last profiles, motion / unit median, the
+#                   rule's transition score, the profile change per radar)
+#   decoding        one event per unit with P(fall) > .5, span by minimum Bayes risk for the mean F1
+#                   at tIoU .1/.3/.5: no frame threshold, merge, NMS, external rule or gate. The same
+#                   run also decodes its dense head with Amir's chain (<name>.amir.csv,
+#                   val/amir/F1_mean), so one run gives both numbers
+#
+# 32 s windows (a whole recording, <= 22 s, plus 2 s on each side and the 6 s inference hop),
+# 15 epochs (2 training stitchings: about twice AP's steps per epoch), dense SWA from epoch 3.
+# No checkpoint is chosen on the held-out streams: validate checkpoints/swa.ckpt.
+#
+#   FOLDS="A B C D" GPU=0 tools/run_rs_cv.sh
+
+seed_everything: 0
+
+run:
+  project: abc2027-fall-jepa
+  group: UWB/RS
+  name: RS
+  notes: >-
+    Recording head (P(fall) per detected recording + start/end distributions, MBR decoding) on the
+    AP + radar dropout + dense SWA trunk, complex I/Q input, 32 s windows; subject-held-out CV.
+  tags: [uwb, frame, amir, recording-head, complex, cv]
+  wandb: offline
+
+trainer:
+  max_epochs: 15
+  accelerator: auto
+  devices: 1
+  precision: 32-true
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+  check_val_every_n_epoch: 5      # progress only: nothing is selected on the held-out streams
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 2, bn_batches: 50, every_n_steps: 50}
+
+checkpoint:
+  monitor: null
+  save_top_k: 1
+
+data:
+  release: DATA/folds/A
+  annotate_release: DATA/abc2027_uwb_train_v1   # the official package: src/abc2027/annotate.py
+  stats_path: runs/_cache/fold_A/normalizer.json
+  normalizer: interior
+  train_splits: [train]
+  val_splits: [val]
+  test_splits: [val]
+  window_s: 32.0                  # 1600 timesteps = 400 frames
+  train_hop_s: 2.0
+  infer_hop_s: 6.0                # every unit (<= 22 s) lies >= 2 s inside some window: 22 + 2 x 2 + 6 = 32
+  infer_tail: pad
+  train_sampler: balanced
+  sampler:
+    fall_slots: 16                # a fall slot holds a whole, scored fall recording
+    hard_slots: 4
+    hard_label: Autre
+    groups: DATA/folds/A/groups.csv
+  frame_width: 32
+  frame_stride: 4
+  diff_channel: false
+  complex_input: true
+  physics: true
+  units: true
+  unit_max: 16
+  num_states: 2
+  boundary_s: 0.3
+  boundary_mask_s: 0.2
+  flagged_weight: 0.0
+  flagged_margin_s: 2.0
+  augment:
+    radar_drop_p: 0.15
+  batch_size: 32
+  eval_batch_size: 32
+  num_workers: 10
+
+model:
+  model:
+    class_path: falljepa.model.FallJEPA
+    init_args:
+      d_model: 64
+      nhead: 4
+      mlp_ratio: 2
+      pre_proj_ratio: 2
+      frame_patch_size: [23, 8]   # 8 rows of 23 complex bins
+      frame_pooling: cls
+      frame_encoder_layers: 2
+      context_layers: 2
+      bidir_layers: 2
+      predictor_layers: 2
+      pred_horizons: [8]
+      detach_target: true
+      num_states: 2
+      dropout: 0.1
+      unit_layers: 2
+      unit_max_frames: 340
+
+  losses:
+    State_Frame:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: frame_logits, target_key: frame_state, weight_key: frame_weight,
+                  class_weights: [1.0, 1.0]}
+    State_Step:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: step_logits_flat, target_key: step_state, weight_key: step_weight,
+                  class_weights: [1.0, 1.0]}
+    MSE_Latent:
+      class_path: falljepa.loss.MSELoss
+      init_args: {pred_key: z_v_pred, target_key: z_v_target}
+    SIGReg:
+      class_path: falljepa.loss.SIGRegLoss
+      init_args: {latent_key: z_v_proj, batch_size: 32}
+    Unit:                         # P(fall in the unit)
+      class_path: falljepa.loss.UnitBCELoss
+    Span:                         # start / end of the labelled fall in its unit
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: span_target, weight_key: span_w, sigma: 5.0}
+    Rule:                         # rule distillation: the official rule's interval in non-fall units
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: rule_target, weight_key: rule_w, sigma: 5.0}
+
+  loss_weights:
+    State_Frame: 0.5
+    State_Step: 0.25
+    MSE_Latent: 0.25
+    SIGReg: 0.1
+    Unit: 1.0
+    Span: 1.0
+    Rule: 0.2
+
+  decoder:
+    kind: units
+    threshold: 0.5
+    mbr: true
+    also_amir: true               # Amir's chain on the dense head of the same model, for comparison
+    theta: 0.3
+    gate: true
+  window_weight: triangular
+  window_merge: prob
+  decode_every_n_epochs: 1
+  ignore_flagged: true
+
+  optimizer:
+    class_path: falljepa.optimizer.AdamWConstant
+    init_args:
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-4

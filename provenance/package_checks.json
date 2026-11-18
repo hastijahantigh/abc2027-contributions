@@ -1,0 +1,10 @@
+{
+  "prepared_date": "2026-11-18",
+  "server_access_used": false,
+  "experiments_rerun": false,
+  "original_tcn_cv_archive_sha256": "a24eccccff24b949e5007c2004b3266c65fd52ba524ef27590b47ef40a03b32c",
+  "cv_script_matches_protocol_hash": false,
+  "python_syntax_errors": [],
+  "new_documentation_broken_links": [],
+  "cv_runner_declared_payload_hash_matches_protocol": true
+}

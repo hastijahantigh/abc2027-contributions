@@ -1,0 +1,12 @@
+{
+  "parameter_count": 770179,
+  "full_epochs": 5,
+  "training_windows": 13888,
+  "training_draws": 69440,
+  "global_steps": 17360,
+  "optimizer_updates": 17348,
+  "amp_skipped_steps": 12,
+  "training_seconds": 252.79212716599795,
+  "peak_gpu_allocated_gib": 0.09346914291381836,
+  "note": "Every indexed window visited once per full epoch. Smaller hops increase samples AND optimizer iterations."
+}

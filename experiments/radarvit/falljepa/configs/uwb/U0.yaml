@@ -1,0 +1,122 @@
+# U0: gir's frame JEPA on UWB-FallTrack (see README.md, "The model" and "Hyperparameters")
+#
+#   uv run python run.py fit -c configs/uwb/U0.yaml --data.release /path/to/abc2027_uwb_train_v1
+#
+# Data facts the values below follow (train / val): falls 0.48-5.0 s, median 1.66 / 2.00 s; a fall
+# recording is cropped to 3-8 s before and 5-10 s after the fall (<= 23 s); activity chunks are
+# 8-20 s, so a join every ~16 s; 50 Hz; 3 % of timesteps are falls; 48 % of training falls flagged.
+#
+# frame_width, frame_stride, in_channels and window_frames are linked from data: by the CLI.
+# Values derived from others are written out here; keep them in sync by hand:
+#   SIGReg batch_size = data.batch_size
+#   pred_horizons = [frame_width / frame_stride]
+
+seed_everything: 0
+
+run:
+  project: abc2027-fall-jepa
+  group: UWB/Frame
+  name: U0
+  notes: >-
+    gir frame JEPA on UWB windows: isolated frame encoder, causal context + 2 bidirectional layers,
+    per-frame state head (none/begin/middle/end) averaged over frames, detached latent prediction
+    of the next non-overlapping frame, Viterbi decoding under the fall grammar.
+  tags: [uwb, frame, jepa]
+  wandb: offline
+
+trainer:
+  max_epochs: 150                 # ~218 steps an epoch: ~33k steps
+  accelerator: auto
+  devices: 1
+  precision: bf16-mixed
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+
+checkpoint:
+  monitor: val/event/F1_mean        # the official ranking score on whole val streams (--ignore-flagged)
+  mode: max
+
+data:
+  release: DATA/abc2027_uwb_train_v1
+  stats_path: runs/_cache/normalizer_train.json
+  train_splits: [train]
+  val_splits: [val]
+  test_splits: [val]
+  # 25.6 s = 1280 timesteps = 320 frames: holds a whole fall recording (<= 23 s) with the joins on
+  # both sides, so the model sees the approach, the fall and the lying still that marks its end
+  window_s: 25.6
+  train_hop_s: 12.8               # epoch length only (one window per 12.8 s of training stream); starts are random
+  infer_hop_s: 6.4                # 4 windows per timestep, Hann-merged: a real ensemble, not just edge filling
+  train_crop: random
+  # Frames: 0.64 s (shorter than every fall but the shortest, so onset, descent and landing land in
+  # different frames), moving 0.08 s: 8 frames per timestep, gir S0's ratio (32 / 4); gir w1's F1
+  # (a coarser stride) cost 2.7 pt
+  frame_width: 32
+  frame_stride: 4
+  diff_channel: true              # motion over the static room profile; computed on the continuous stream
+  boundary_s: 0.3                 # begin/end: first/last 0.3 s of a fall (<= a third of it)
+  flagged_weight: 0.5             # flagged falls stay falls, at half weight (the scorer ignores them)
+  flagged_margin_s: 0.0
+  augment: {gain_std: 0.1, noise_std: 0.05, radar_drop_p: 0.1}
+  batch_size: 8                   # 16 needed > 11 GB on a 24 GB card that was shared; 8 x 320 frames
+  eval_batch_size: 16
+  num_workers: 8
+
+model:
+  model:
+    class_path: falljepa.model.FallJEPA
+    init_args:
+      d_model: 128                # gir S0; 6 h of training stream does not call for more
+      nhead: 4
+      frame_patch_size: [23, 8]   # 23 range bins (368 = 16 x 23) x 8 timesteps: 64 tokens a frame
+      frame_pooling: cls
+      frame_encoder_layers: 4
+      context_layers: 2           # causal (feeds the latent predictor)
+      bidir_layers: 2             # scoring is offline; gir w2: one bidirectional layer gave 1.7 pt
+      predictor_layers: 2
+      pred_horizons: [8]          # w / s: the next frame that shares no timestep (k = 1 is won by copying)
+      detach_target: true         # gir w1/w2: an attached target collapses z
+      num_states: 4
+      dropout: 0.1
+
+  losses:
+    State_Frame:                  # every frame, on each timestep it covers
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: frame_logits, target_key: frame_state, weight_key: frame_weight,
+                  class_weights: [1.0, 4.0, 2.0, 4.0]}   # none, begin, middle, end: boundaries are rarest and score tIoU
+    State_Step:                   # the frames' average, per timestep of the window (what is decoded)
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: step_logits_flat, target_key: step_state, weight_key: step_weight,
+                  class_weights: [1.0, 4.0, 2.0, 4.0]}
+    MSE_Latent:
+      class_path: falljepa.loss.MSELoss
+      init_args: {pred_key: z_v_pred, target_key: z_v_target}
+    SIGReg:
+      class_path: falljepa.loss.SIGRegLoss
+      init_args: {latent_key: z_v_proj, batch_size: 8}
+
+  loss_weights:
+    State_Frame: 1.0
+    State_Step: 0.5
+    MSE_Latent: 0.25              # an auxiliary term until it beats MSE_Latent 0 (gir's C1 gate)
+    SIGReg: 0.1
+
+  # Starting point; tune it out of fold with falljepa.tune_decoder, never on val
+  decoder:
+    kind: viterbi
+    switch_penalty: 2.0
+    min_duration_s: 0.4           # the shortest fall is 0.48 s
+    spread_penalty: 0.0
+  window_floor: 0.001
+  decode_every_n_epochs: 1
+  ignore_flagged: true
+
+  optimizer:
+    class_path: falljepa.optimizer.AdamWWithCosineScheduler
+    init_args:
+      learning_rate: 1.5e-4       # 2e-4 at batch 16, scaled by sqrt(1/2)
+      weight_decay: 0.05
+      min_lr: 1.0e-6
+      warmup_ratio: 0.05

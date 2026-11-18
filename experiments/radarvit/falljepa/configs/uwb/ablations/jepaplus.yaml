@@ -1,0 +1,11 @@
+# jepaplus: the AP base with a stronger JEPA objective: latent prediction weight 0.5 (from 0.25) at
+# three horizons, 4, 8 and 16 frames ahead (0.32 / 0.64 / 1.28 s). Why: JEPA was the one change
+# with a gain on every seed (+0.057 SWA F1, all through recall).
+run:
+  notes: "AP + JEPA weight 0.5 at horizons 4, 8, 16 frames."
+model:
+  model:
+    init_args:
+      pred_horizons: [4, 8, 16]
+  loss_weights:
+    MSE_Latent: 0.5

@@ -1,0 +1,13 @@
+# A1: no JEPA loss and no latent predictor Hv. SIGReg and the pre-projector stay.
+# Overlays are deep-merged by tools/compose_config.py (run_ablations.sh does it), not chained with
+# -c: `__delete__` removes a key.
+run:
+  notes: "A1: no JEPA loss, no latent predictor Hv; SIGReg stays."
+model:
+  model:
+    init_args:
+      predictor_layers: 0
+  losses:
+    MSE_Latent: __delete__
+  loss_weights:
+    MSE_Latent: __delete__

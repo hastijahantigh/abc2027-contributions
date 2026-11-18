@@ -1,0 +1,107 @@
+{
+  "selected_method": "signal_runs_tuned",
+  "config": {
+    "candidates": "runs",
+    "threshold": 0.1,
+    "anchor_nms": 0.1,
+    "refine": true,
+    "gate": true,
+    "merge": true,
+    "final_iou": 0.1,
+    "center_nms": null
+  },
+  "all_method_configs": {
+    "tcn_fixed": {
+      "candidates": "anchors",
+      "threshold": 0.8,
+      "anchor_nms": 0.1,
+      "refine": false,
+      "gate": false,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_tuned": {
+      "candidates": "anchors",
+      "threshold": 0.13,
+      "anchor_nms": 0.1,
+      "refine": false,
+      "gate": false,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_fixed_refined": {
+      "candidates": "anchors",
+      "threshold": 0.8,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": false,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_fixed_refined_gate": {
+      "candidates": "anchors",
+      "threshold": 0.8,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": true,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_tuned_refined": {
+      "candidates": "anchors",
+      "threshold": 0.13,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": false,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_tuned_refined_gate": {
+      "candidates": "anchors",
+      "threshold": 0.13,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": true,
+      "merge": false,
+      "final_iou": null,
+      "center_nms": null
+    },
+    "tcn_tuned_refined_gate_nms": {
+      "candidates": "anchors",
+      "threshold": 0.13,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": true,
+      "merge": false,
+      "final_iou": 0.1,
+      "center_nms": null
+    },
+    "signal_runs_tuned": {
+      "candidates": "runs",
+      "threshold": 0.1,
+      "anchor_nms": 0.1,
+      "refine": true,
+      "gate": true,
+      "merge": true,
+      "final_iou": 0.1,
+      "center_nms": null
+    }
+  },
+  "tuning_folds": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "tuning_score": {
+    "f1_mean": 0.7518518518518519,
+    "start_error_median_abs": 0.030000000000086402,
+    "false_alarms_per_hour": 3.15727798112312
+  },
+  "note": "Stagewise historical search, with labels restricted to the listed tuning folds. Fixed signal constants; no 5.9-second center suppression."
+}

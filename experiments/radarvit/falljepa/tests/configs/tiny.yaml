@@ -1,0 +1,19 @@
+# Layered after configs/uwb/U0.yaml by the CLI test: the same model, tiny and on CPU
+run:
+  wandb: disabled
+trainer:
+  max_epochs: 2
+  accelerator: cpu
+  devices: 1
+  precision: 32-true
+  log_every_n_steps: 1
+  enable_progress_bar: false
+data:
+  window_s: 4.0
+  train_hop_s: 2.0
+  infer_hop_s: 2.0
+  batch_size: 4
+  num_workers: 0
+model:
+  model:
+    init_args: {d_model: 32, nhead: 2, frame_encoder_layers: 1, context_layers: 1, bidir_layers: 1, predictor_layers: 1}

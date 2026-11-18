@@ -1,0 +1,186 @@
+# JF5-T (docs/falljepa_JF4_design.md, section 11): JF5 (= JF4 S-early, configs/uwb/JF5.yaml) + JF4 ST's
+# local encoder: a dilated TCN (dilations 1 2 4 8, 4.9 s receptive field, no pooling) after z, and 3
+# bidirectional blocks with RoPE instead of 2 causal + 2 bidirectional. No JEPA predictor (a centred TCN
+# would leak into it); SIGReg stays on z. The untested combination: early fusion + TCN.
+#
+#   CONFIG=configs/uwb/JF5T.yaml NAME=JF5T GROUP=UWB/JF5T SEED=0 tools/run_jf_cv.sh
+
+seed_everything: 0
+
+run:
+  project: abc2027-fall-jepa
+  group: UWB/JF7b
+  name: JF7b
+  notes: >-
+    JF7b: JF7a + boundary refinement stage (+-3 s crops at 50 Hz). JF6 (JF5T) + expected pair-tIoU span loss, slot quality head (score = P x tIoU), member boundary channels.
+  tags: [uwb, frame, join-free, sets, complex, cv]
+  wandb: offline
+trainer:
+  max_epochs: 15
+  accelerator: auto
+  devices: 1
+  precision: 32-true
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  accumulate_grad_batches: 1      # JF2's optimizer step (8 chunks: 4 x 2 accumulated) in one GPU batch (JF4 fits)
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+  check_val_every_n_epoch: 5      # progress only: nothing is selected on the held-out streams
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 2, bn_batches: 50, every_n_steps: 50}
+checkpoint:
+  monitor: null
+  save_top_k: 1
+data:
+  release: DATA/folds/A
+  stats_path: runs/_cache/fold_A/normalizer.json
+  normalizer: interior
+  train_splits: [train]
+  val_splits: [val]
+  test_splits: [val]
+  window_s: 32.0                  # 1600 timesteps = 400 frames
+  train_hop_s: 8.0                # chunks (50 s) on an 8 s grid: as many steps per epoch as RS
+  infer_hop_s: 6.0
+  infer_tail: pad
+  fall_sets: true
+  chunk_windows: 4                # a training item: 4 inference windows, 6 s apart
+  train_sampler: balanced
+  sampler:
+    fall_slots: 4                 # of 8 chunks: JF2's 2 of 4, twice per step
+    hard_slots: 2
+    hard_label: Autre
+    split: 1
+    groups: DATA/folds/A/groups.csv
+  frame_width: 32
+  frame_stride: 4
+  diff_channel: false
+  complex_input: true
+  clutter_s: 8.0
+  amplitude: false                # [I, Q, I_c, Q_c] x 3 + valid = 13 channels
+  physics: true
+  units: false
+  num_states: 2
+  boundary_s: 0.3
+  boundary_mask_s: 0.2
+  flagged_weight: 0.0
+  flagged_margin_s: 2.0
+  augment:
+    radar_drop_p: 0.15
+    bg_swap_p: 0.5
+    bg_swap_s: 2.0
+  batch_size: 8                   # chunks per batch = per optimizer step, as JF2
+  eval_batch_size: 32
+  num_workers: 10
+model:
+  model:
+    class_path: falljepa.model.FallSetJEPA
+    init_args:
+      d_model: 64
+      nhead: 4
+      mlp_ratio: 2
+      pre_proj_ratio: 2
+      frame_patch_size: [23, 8]   # 8 rows of 23 complex bins
+      frame_pooling: cls
+      frame_encoder_layers: 2
+      context_layers: 0
+      bidir_layers: 3
+      predictor_layers: 0           # no JEPA: the TCN sees the future
+      pred_horizons: []
+      detach_target: true
+      num_states: 2
+      dropout: 0.1
+      num_queries: 3
+      query_layers: 2
+      group_slots: 2
+      group_layers: 2
+      event_physics: true
+      proposal_threshold: 0.05
+      group_iou: 0.2
+      group_margin_s: 5.0
+      group_max_s: 24.0
+      group_gap_s: 3.0
+      max_members: 12
+      max_groups: 6
+      member_drop: 0.25
+      span_jitter_s: 0.2
+      fall_jitter_s: 0.3
+      negative_groups: 1
+      stable_anchors: true
+      raw_drop_p: 0.3
+      raw_channels: 6                # raw I and Q
+      trunk: stem
+      radar_fusion: early
+      stem_channels: [16, 32, 48, 64]
+      range_heads: 4
+      local: tcn
+      tcn_dilations: [1, 2, 4, 8]
+      rope: true
+      member_channels: true         # JF7: members' starts and ends as step channels of stage 2
+      quality: true                 # JF7: a head predicting each slot's tIoU
+      boundary: true                # JF7b: re-place each start and end from a +-3 s crop
+      boundary_half_s: 3.0
+  losses:
+    State_Frame:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: frame_logits, target_key: frame_state, weight_key: frame_weight,
+                  class_weights: [1.0, 1.0]}
+    State_Step:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: step_logits_flat, target_key: step_state, weight_key: step_weight,
+                  class_weights: [1.0, 1.0]}
+    SIGReg:
+      class_path: falljepa.loss.SIGRegLoss
+      init_args: {latent_key: z_v_proj, batch_size: 32}
+    Query_Obj:                    # P(fall) of each window query (set-matched)
+      class_path: falljepa.loss.UnitBCELoss
+      init_args: {logit_key: q_logit, target_key: q_target, weight_key: q_w}
+    Query_Span:
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: q_span, weight_key: q_span_w, logits_key: q_span_logits, domain_key: q_domain, sigma: 12.5}
+    Group_Obj:                    # P(fall) of each group slot
+      class_path: falljepa.loss.UnitBCELoss
+      init_args: {logit_key: g_logit, target_key: g_target, weight_key: g_w}
+    Group_Span:
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: g_span, weight_key: g_span_w, logits_key: g_span_logits, domain_key: g_domain, sigma: 12.5}
+    Query_PairIoU:                # JF7: 1 - expected (smoothed) challenge gain over (start, end) pairs
+      class_path: falljepa.loss.SpanPairIoULoss
+      init_args: {target_key: q_span, weight_key: q_span_w, logits_key: q_span_logits, domain_key: q_domain}
+    Group_PairIoU:
+      class_path: falljepa.loss.SpanPairIoULoss
+      init_args: {target_key: g_span, weight_key: g_span_w, logits_key: g_span_logits, domain_key: g_domain}
+    Group_Quality:                # JF7: BCE of the predicted tIoU of each slot's MBR span
+      class_path: falljepa.loss.UnitBCELoss
+      init_args: {logit_key: g_quality, target_key: g_qtarget, weight_key: g_qw}
+    Boundary_CE:                  # JF7b: the crop's boundary against a Gaussian of 0.1 s around the truth
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: b_target, weight_key: b_w, logits_key: b_logits, domain_key: b_domain, sigma: 5.0}
+  loss_weights:
+    State_Frame: 0.5
+    State_Step: 0.25
+    SIGReg: 0.1
+    Query_Obj: 1.0
+    Query_Span: 0.5
+    Group_Obj: 1.0
+    Group_Span: 0.5
+    Query_PairIoU: 2.0
+    Group_PairIoU: 2.0
+    Group_Quality: 1.0
+    Boundary_CE: 1.0
+  decoder:
+    kind: sets
+    threshold: 0.5
+    proposal_threshold: 0.05
+    group_iou: 0.2
+    nms_iou: 0.5
+    centre_s: 3.0
+  window_weight: triangular
+  window_merge: prob
+  decode_every_n_epochs: 1
+  ignore_flagged: true
+  optimizer:
+    class_path: falljepa.optimizer.AdamWConstant
+    init_args:
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-4

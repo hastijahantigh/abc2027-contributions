@@ -1,0 +1,3 @@
+# JEPA: the AP base (configs/uwb/AP.yaml) as it is: latent prediction (0.25) and SIGReg (0.1).
+run:
+  notes: "AP with the JEPA objective: latent prediction of the frame 8 ahead (0.25) + SIGReg (0.1)."

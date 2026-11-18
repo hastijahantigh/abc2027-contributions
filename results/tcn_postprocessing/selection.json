@@ -1,0 +1,20 @@
+{
+  "version": "1.0",
+  "method": "tcn_tuned_refined_gate_nms",
+  "config": {
+    "candidates": "anchors",
+    "threshold": 0.51,
+    "anchor_nms": 0.1,
+    "refine": true,
+    "gate": true,
+    "merge": false,
+    "final_iou": 0.1,
+    "center_nms": null
+  },
+  "helper_hashes": {
+    "annotate": "ffc4d613a643ee9d627d585cc70dbdff6041c2390e90ca20209f47af13044958",
+    "evaluate": "df23749689ac2a41861f400059b18a575ada32ca91ea49733d9d219c3d9d4daa"
+  },
+  "script_sha256": "466ee418bd46ed28cb2af6afe253f5486e0e6fbc471feb7172c3ce479927eac4",
+  "note": "Selected on validation labels. Freeze before hidden test; no hidden-test score claimed."
+}

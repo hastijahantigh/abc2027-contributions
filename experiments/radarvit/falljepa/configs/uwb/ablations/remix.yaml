@@ -1,0 +1,15 @@
+# remix: on-the-fly stream re-synthesis (data/remix.py); stack on rdrop (rdrop+remix). Half of the
+# training windows are rebuilt from segments of the training streams: a fresh lead-in of 1-8 s before
+# the fall, 2-10 s after it, then random activity / fall / Autre-Empty segments around it, joined by
+# the generator's 0.2 s crossfade. Why: the systematic misses (P2_8 / P2_9 Chute04) come 1.2-2.4 s
+# after a join or right after another fall recording, and the frame loss memorises the fixed streams
+# by epoch 5; dynamic mixing gives new contexts every epoch. Uses only the published training streams.
+run:
+  notes: "AP + remix 0.5: training windows re-synthesised from training-stream segments."
+data:
+  num_workers: 11                 # remix is CPU-bound (about 3x slower per step on 8 workers); draws are seeded per window
+  augment:
+    remix_p: 0.5
+    remix_lead_s: [1.0, 8.0]
+    remix_tail_s: [2.0, 10.0]
+    remix_kinds: {adl: 0.7, fall: 0.2, other: 0.1}

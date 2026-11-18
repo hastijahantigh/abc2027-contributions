@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.DS_Store
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+ema_cache/
+residual_cache/
+wandb/

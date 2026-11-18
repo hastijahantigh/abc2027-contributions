@@ -1,0 +1,17 @@
+# Recording-grouped cross-validation on the training streams (data/folds.py), layered after U0:
+#
+#   uv run python run.py fit -c configs/uwb/U0.yaml -c configs/uwb/cv.yaml --data.cv_fold 0 --run.name U0-cv0
+#
+# or every fold, then the decoder tuned out of fold: tools/run_cv.sh configs/uwb/U0.yaml
+# Validation scores only the held-out fold's timesteps of the training streams. No checkpoint is
+# chosen on it (that would select on the held-out fold): "best" is simply the last epoch.
+run:
+  group: UWB/CV
+  tags: [uwb, frame, jepa, cv]
+checkpoint:
+  monitor: null
+  save_top_k: 1
+data:
+  # The friend's Stage04 folds (copied from outputs/stage04_deep_audit/run_20261008/metadata/source_fold_assignment.csv)
+  cv_assignment: configs/folds/stage04_source_folds.csv
+  cv_fold: 0

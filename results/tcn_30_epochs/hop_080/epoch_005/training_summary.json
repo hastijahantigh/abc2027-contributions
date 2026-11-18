@@ -1,0 +1,10 @@
+{
+  "parameter_count": 774339,
+  "full_epochs": 5,
+  "training_windows": 13888,
+  "training_draws": 69440,
+  "global_steps": 17360,
+  "optimizer_updates": 17348,
+  "amp_skipped_steps": 12,
+  "training_seconds": 250.05622188799316
+}

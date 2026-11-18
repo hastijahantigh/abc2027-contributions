@@ -1,0 +1,9 @@
+# rshift: the AP base (configs/uwb/AP.yaml) with a range shift of every training window by up to
+# +-8 bins (about +-40 cm), the same shift for the three radars, so the radars stay mixed early.
+# Bins shifted in from outside are 0 (the training mean). Why: the frame loss overfits by epoch 5,
+# and the fall mats sit at fixed ranges, a "where" shortcut.
+run:
+  notes: "AP + range shift of the training windows by up to +-8 bins (same shift for all radars)."
+data:
+  augment:
+    range_shift: 8

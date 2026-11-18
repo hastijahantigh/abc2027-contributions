@@ -1,0 +1,177 @@
+# JF4 = STC (docs/falljepa_JF4_design.md, sections 2.2, 4 and 5): ST + 3 before / after contrast maps per
+# radar (gap / width 0.3 / 0.5, 0.3 / 1.0, 0.5 / 2.0 s) into the stem, and the step swap: with p .5 a
+# training chunk gets a decoy background step at a random time not within 3 s before to 1 s after a fall.
+#
+#   FOLDS=D CONFIG=configs/uwb/JF4.yaml NAME=JF4 GROUP=UWB/JF4 tools/run_jf_cv.sh
+
+seed_everything: 0
+
+run:
+  project: abc2027-fall-jepa
+  group: UWB/JF4
+  name: JF4
+  notes: >-
+    JF4: ST + before/after contrast maps into the stem + step swap (decoy joins).
+  tags: [uwb, frame, join-free, sets, complex, cv]
+  wandb: offline
+trainer:
+  max_epochs: 15
+  accelerator: auto
+  devices: 1
+  precision: 32-true
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  accumulate_grad_batches: 1      # JF2's optimizer step (8 chunks: 4 x 2 accumulated) in one GPU batch (JF4 fits)
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+  check_val_every_n_epoch: 5      # progress only: nothing is selected on the held-out streams
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 2, bn_batches: 50, every_n_steps: 50}
+checkpoint:
+  monitor: null
+  save_top_k: 1
+data:
+  release: DATA/folds/A
+  stats_path: runs/_cache/fold_A/normalizer.json
+  normalizer: interior
+  train_splits: [train]
+  val_splits: [val]
+  test_splits: [val]
+  window_s: 32.0                  # 1600 timesteps = 400 frames
+  train_hop_s: 8.0                # chunks (50 s) on an 8 s grid: as many steps per epoch as RS
+  infer_hop_s: 6.0
+  infer_tail: pad
+  fall_sets: true
+  chunk_windows: 4                # a training item: 4 inference windows, 6 s apart
+  train_sampler: balanced
+  sampler:
+    fall_slots: 4                 # of 8 chunks: JF2's 2 of 4, twice per step
+    hard_slots: 2
+    hard_label: Autre
+    split: 1
+    groups: DATA/folds/A/groups.csv
+  frame_width: 32
+  frame_stride: 4
+  diff_channel: false
+  complex_input: true
+  clutter_s: 8.0
+  amplitude: false                # [I, Q, I_c, Q_c] x 3 + valid = 13 channels
+  contrast: [[0.3, 0.5], [0.3, 1.0], [0.5, 2.0]]   # + 3 x 3 contrast maps: 22 channels
+  contrast_in_model: true          # computed on the GPU from the raw I / Q context (the loader is the bottleneck)
+  physics: true
+  units: false
+  num_states: 2
+  boundary_s: 0.3
+  boundary_mask_s: 0.2
+  flagged_weight: 0.0
+  flagged_margin_s: 2.0
+  augment:
+    radar_drop_p: 0.15
+    bg_swap_p: 0.5
+    bg_swap_s: 2.0
+    step_swap_p: 0.5
+    step_swap_s: 2.0
+  batch_size: 8                   # chunks per batch = per optimizer step, as JF2
+  eval_batch_size: 32
+  num_workers: 10
+model:
+  model:
+    class_path: falljepa.model.FallSetJEPA
+    init_args:
+      d_model: 64
+      nhead: 4
+      mlp_ratio: 2
+      pre_proj_ratio: 2
+      frame_patch_size: [23, 8]   # 8 rows of 23 complex bins
+      frame_pooling: cls
+      frame_encoder_layers: 2
+      context_layers: 0
+      bidir_layers: 3
+      predictor_layers: 0           # no JEPA: the TCN sees the future
+      pred_horizons: []
+      detach_target: true
+      num_states: 2
+      dropout: 0.1
+      num_queries: 3
+      query_layers: 2
+      group_slots: 2
+      group_layers: 2
+      event_physics: true
+      proposal_threshold: 0.05
+      group_iou: 0.2
+      group_margin_s: 5.0
+      group_max_s: 24.0
+      group_gap_s: 3.0
+      max_members: 12
+      max_groups: 6
+      member_drop: 0.25
+      span_jitter_s: 0.2
+      fall_jitter_s: 0.3
+      negative_groups: 1
+      stable_anchors: true
+      raw_drop_p: 0.3
+      raw_channels: 6                # raw I and Q
+      trunk: stem
+      radar_fusion: attention
+      stem_channels: [16, 32, 48, 64]
+      range_heads: 4
+      local: tcn
+      tcn_dilations: [1, 2, 4, 8]
+      rope: true
+  losses:
+    State_Frame:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: frame_logits, target_key: frame_state, weight_key: frame_weight,
+                  class_weights: [1.0, 1.0]}
+    State_Step:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: step_logits_flat, target_key: step_state, weight_key: step_weight,
+                  class_weights: [1.0, 1.0]}
+    SIGReg:
+      class_path: falljepa.loss.SIGRegLoss
+      init_args: {latent_key: z_v_proj, batch_size: 32}
+    Query_Obj:                    # P(fall) of each window query (set-matched)
+      class_path: falljepa.loss.UnitBCELoss
+      init_args: {logit_key: q_logit, target_key: q_target, weight_key: q_w}
+    Query_Span:
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: q_span, weight_key: q_span_w, logits_key: q_span_logits, domain_key: q_domain, sigma: 12.5}
+    Group_Obj:                    # P(fall) of each group slot
+      class_path: falljepa.loss.UnitBCELoss
+      init_args: {logit_key: g_logit, target_key: g_target, weight_key: g_w}
+    Group_Span:
+      class_path: falljepa.loss.SpanSoftCELoss
+      init_args: {target_key: g_span, weight_key: g_span_w, logits_key: g_span_logits, domain_key: g_domain, sigma: 12.5}
+    Query_IoU:                    # 1 - tIoU of the expected span
+      class_path: falljepa.loss.SpanIoULoss
+      init_args: {target_key: q_span, weight_key: q_span_w, logits_key: q_span_logits, domain_key: q_domain}
+    Group_IoU:
+      class_path: falljepa.loss.SpanIoULoss
+      init_args: {target_key: g_span, weight_key: g_span_w, logits_key: g_span_logits, domain_key: g_domain}
+  loss_weights:
+    State_Frame: 0.5
+    State_Step: 0.25
+    SIGReg: 0.1
+    Query_Obj: 1.0
+    Query_Span: 1.0
+    Group_Obj: 1.0
+    Group_Span: 1.0
+    Query_IoU: 1.0
+    Group_IoU: 1.0
+  decoder:
+    kind: sets
+    threshold: 0.5
+    proposal_threshold: 0.05
+    group_iou: 0.2
+    nms_iou: 0.5
+    centre_s: 3.0
+  window_weight: triangular
+  window_merge: prob
+  decode_every_n_epochs: 1
+  ignore_flagged: true
+  optimizer:
+    class_path: falljepa.optimizer.AdamWConstant
+    init_args:
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-4

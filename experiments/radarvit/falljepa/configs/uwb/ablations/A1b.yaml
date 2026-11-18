@@ -1,0 +1,15 @@
+# A1b: purely supervised: no JEPA loss, no Hv, no SIGReg and no pre-projector (the frame encoder's
+# output is z). Deep-merged by tools/compose_config.py; `__delete__` removes a key.
+run:
+  notes: "A1b: supervised only: no JEPA loss, no Hv, no SIGReg, no pre-projector."
+model:
+  model:
+    init_args:
+      predictor_layers: 0
+      pre_projector: false
+  losses:
+    MSE_Latent: __delete__
+    SIGReg: __delete__
+  loss_weights:
+    MSE_Latent: __delete__
+    SIGReg: __delete__

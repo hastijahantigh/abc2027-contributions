@@ -1,0 +1,8 @@
+# A2c: control for A2: 0 causal + 2 bidirectional layers (separates "bidirectional" from "fewer layers").
+run:
+  notes: "A2c: 0 causal + 2 bidirectional context layers (control for A2)."
+model:
+  model:
+    init_args:
+      context_layers: 0
+      bidir_layers: 2

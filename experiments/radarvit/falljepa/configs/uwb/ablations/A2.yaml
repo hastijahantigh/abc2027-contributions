@@ -1,0 +1,11 @@
+# A2: no causal context layers; all 4 context layers bidirectional (same parameter count).
+# Layered on the reference, e.g. A1+A2 (stage 2 of tools/run_stages.sh does this). With JEPA on
+# (A0+A2), Hv reads frames without context: it is causal itself, so nothing leaks, but the JEPA
+# term changes too.
+run:
+  notes: "A2: 0 causal + 4 bidirectional context layers."
+model:
+  model:
+    init_args:
+      context_layers: 0
+      bidir_layers: 4

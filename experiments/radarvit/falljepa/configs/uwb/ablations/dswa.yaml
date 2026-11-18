@@ -1,0 +1,8 @@
+# dswa: dense weight averaging (SWAD): a snapshot every 50 steps (about 7 an epoch) from epoch 4 on,
+# instead of one per epoch from epoch 11; stack on rdrop (rdrop+dswa). Compare with swa5.
+run:
+  notes: "AP with dense weight averaging: every 50 steps from epoch 4."
+trainer:
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 3, bn_batches: 50, every_n_steps: 50}

@@ -1,0 +1,247 @@
+{
+  "archive_sha256": "983b8749c413ddb997d52edecbd0d73359875c8f01d8933c5d63a2678b83c756",
+  "helper_hash_match": {
+    "annotate": true,
+    "evaluate": true
+  },
+  "script_hash_match": true,
+  "all_reports_exactly_reproduced": {
+    "reference_center_5p9": true,
+    "selected": true,
+    "signal_runs_tuned": true,
+    "tcn_fixed_refined_gate": true,
+    "tcn_fixed_refined": true,
+    "tcn_fixed": true,
+    "tcn_tuned_refined_gate_nms": true,
+    "tcn_tuned_refined_gate": true,
+    "tcn_tuned_refined": true,
+    "tcn_tuned": true
+  },
+  "frames": 368790,
+  "duration_hours": 2.0488333333333335,
+  "recovered_events": [
+    [
+      "val_00",
+      50.52,
+      52.52
+    ],
+    [
+      "val_00",
+      125.28,
+      127.26
+    ],
+    [
+      "val_00",
+      807.72,
+      810.46
+    ],
+    [
+      "val_02",
+      1753.84,
+      1754.94
+    ],
+    [
+      "val_03",
+      1575.28,
+      1576.92
+    ]
+  ],
+  "lost_events": [],
+  "same_matched_events": {
+    "original": {
+      "events": 56,
+      "median_start_error": 0.4180161178111632,
+      "median_end_error": 0.2865107822418054
+    },
+    "selected": {
+      "events": 56,
+      "median_start_error": 0.03999999999996362,
+      "median_end_error": 0.03999999999996362
+    }
+  },
+  "remaining_false_positives": [
+    {
+      "stream_id": "val_00",
+      "t_start": 307.08,
+      "t_end": 310.46,
+      "score": 0.5283203125,
+      "t_alarm": null
+    },
+    {
+      "stream_id": "val_00",
+      "t_start": 1512.86,
+      "t_end": 1515.44,
+      "score": 0.9619140625,
+      "t_alarm": null
+    },
+    {
+      "stream_id": "val_01",
+      "t_start": 597.48,
+      "t_end": 599.94,
+      "score": 0.798828125,
+      "t_alarm": null
+    },
+    {
+      "stream_id": "val_02",
+      "t_start": 1309.54,
+      "t_end": 1310.32,
+      "score": 0.81103515625,
+      "t_alarm": null
+    }
+  ],
+  "remaining_false_negatives": [
+    {
+      "stream_id": "val_00",
+      "t_start": 37.9,
+      "t_end": 39.9,
+      "ignore": false
+    },
+    {
+      "stream_id": "val_00",
+      "t_start": 862.48,
+      "t_end": 864.74,
+      "ignore": false
+    },
+    {
+      "stream_id": "val_00",
+      "t_start": 1485.02,
+      "t_end": 1487.02,
+      "ignore": false
+    },
+    {
+      "stream_id": "val_00",
+      "t_start": 1508.1,
+      "t_end": 1510.1,
+      "ignore": false
+    },
+    {
+      "stream_id": "val_02",
+      "t_start": 1302.84,
+      "t_end": 1304.84,
+      "ignore": false
+    },
+    {
+      "stream_id": "val_04",
+      "t_start": 172.56,
+      "t_end": 174.3,
+      "ignore": false
+    }
+  ],
+  "per_stream": {
+    "val_00": {
+      "theta": 0.3,
+      "tp": 17,
+      "fp": 2,
+      "fn": 4,
+      "precision": 0.8947368421052632,
+      "recall": 0.8095238095238095,
+      "f1": 0.8500000000000001,
+      "false_alarms_per_hour": 4.082141763712028,
+      "start_error_mean_abs": 0.1752941176470582,
+      "start_error_median_abs": 0.01999999999998181,
+      "end_error_mean_abs": 0.12705882352942743,
+      "end_error_median_abs": 0.08000000000015461,
+      "mean_tiou": 0.8640309679300319,
+      "latency_mean": 0.12117647058824044,
+      "latency_median": 0.0,
+      "n_ignored_ground_truth": 13,
+      "n_ignored_predictions": 4,
+      "start_within_0.5": 0.8235294117647058,
+      "end_within_0.5": 1.0,
+      "start_within_1.0": 1.0,
+      "end_within_1.0": 1.0
+    },
+    "val_01": {
+      "theta": 0.3,
+      "tp": 18,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.9473684210526315,
+      "recall": 1.0,
+      "f1": 0.972972972972973,
+      "false_alarms_per_hour": 2.0357154974497007,
+      "start_error_mean_abs": 0.271111111111084,
+      "start_error_median_abs": 0.049999999999954525,
+      "end_error_mean_abs": 0.1711111111111276,
+      "end_error_median_abs": 0.01999999999999602,
+      "mean_tiou": 0.8183830839040768,
+      "latency_mean": 0.2622222222221906,
+      "latency_median": 0.03999999999996362,
+      "n_ignored_ground_truth": 13,
+      "n_ignored_predictions": 2,
+      "start_within_0.5": 0.7222222222222222,
+      "end_within_0.5": 0.8333333333333334,
+      "start_within_1.0": 0.9444444444444444,
+      "end_within_1.0": 0.9444444444444444
+    },
+    "val_02": {
+      "theta": 0.3,
+      "tp": 18,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.9473684210526315,
+      "recall": 0.9473684210526315,
+      "f1": 0.9473684210526315,
+      "false_alarms_per_hour": 2.0435039280686618,
+      "start_error_mean_abs": 0.0877777777777698,
+      "start_error_median_abs": 0.049999999999954525,
+      "end_error_mean_abs": 0.21000000000000085,
+      "end_error_median_abs": 0.04999999999998295,
+      "mean_tiou": 0.8818745407855961,
+      "latency_mean": 0.04777777777778406,
+      "latency_median": 0.01999999999998181,
+      "n_ignored_ground_truth": 12,
+      "n_ignored_predictions": 4,
+      "start_within_0.5": 0.9444444444444444,
+      "end_within_0.5": 0.8333333333333334,
+      "start_within_1.0": 1.0,
+      "end_within_1.0": 0.8888888888888888
+    },
+    "val_03": {
+      "theta": 0.3,
+      "tp": 5,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "false_alarms_per_hour": 0.0,
+      "start_error_mean_abs": 0.18399999999999822,
+      "start_error_median_abs": 0.03999999999996362,
+      "end_error_mean_abs": 0.03199999999997516,
+      "end_error_median_abs": 0.020000000000003126,
+      "mean_tiou": 0.8858633303901563,
+      "latency_mean": 0.08000000000000185,
+      "latency_median": 0.0,
+      "n_ignored_ground_truth": 13,
+      "n_ignored_predictions": 2,
+      "start_within_0.5": 0.8,
+      "end_within_0.5": 1.0,
+      "start_within_1.0": 1.0,
+      "end_within_1.0": 1.0
+    },
+    "val_04": {
+      "theta": 0.3,
+      "tp": 3,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.75,
+      "f1": 0.8571428571428571,
+      "false_alarms_per_hour": 0.0,
+      "start_error_mean_abs": 0.0400000000000027,
+      "start_error_median_abs": 0.019999999999999574,
+      "end_error_mean_abs": 0.11333333333333684,
+      "end_error_median_abs": 0.020000000000010232,
+      "mean_tiou": 0.9238121890547241,
+      "latency_mean": 0.02666666666667202,
+      "latency_median": 0.019999999999999574,
+      "n_ignored_ground_truth": 1,
+      "n_ignored_predictions": 0,
+      "start_within_0.5": 1.0,
+      "end_within_0.5": 1.0,
+      "start_within_1.0": 1.0,
+      "end_within_1.0": 1.0
+    }
+  }
+}

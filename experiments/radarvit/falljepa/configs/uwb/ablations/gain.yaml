@@ -1,0 +1,10 @@
+# gain: per-radar log-normal gain (sd 0.1) and additive noise (sd 0.05) on the z-scored CIR of the
+# training windows, as U0 had; stack on rdrop (rdrop+gain). Physics features are not changed. Why:
+# the misses that stay are one subject's falls (P2_8 Chute04), a subject shift; cheap
+# reflectivity/noise jitter is the simplest test of whether input diversity helps before the remix.
+run:
+  notes: "AP + per-radar gain 0.1 and noise 0.05 on the training windows."
+data:
+  augment:
+    gain_std: 0.1
+    noise_std: 0.05

@@ -1,0 +1,16 @@
+# Ablations trained on all of train and scored on the official val streams: U0, this file and one
+# or more overlays from configs/uwb/ablations/, deep-merged by tools/compose_config.py (LightningCLI's
+# -c chaining would replace the losses dicts whole; see docs/falljepa_ablation_plan.md):
+#
+#   uv run python tools/compose_config.py /tmp/A1.yaml configs/uwb/U0.yaml configs/uwb/ablation.yaml configs/uwb/ablations/A1.yaml
+#   uv run python run.py fit -c /tmp/A1.yaml
+#
+# or every (ablation, seed) on a GPU queue: tools/run_ablations.sh A0 A1 A1+A2;
+# stage 1 then stage 2 on its winner: tools/run_stages.sh
+# The ablations are compared by the mean val/event/F1_mean over the last 30 epochs
+# (tools/compare_ablations.py), never by the best epoch, which is selected on val.
+run:
+  group: UWB/Ablation
+  tags: [uwb, frame, ablation]
+trainer:
+  max_epochs: 100                 # ~22k steps; val F1 is flat from about epoch 60 in U0

@@ -1,0 +1,137 @@
+# AP: FallJEPA's architecture, shrunk to ~290k parameters, with Amir's preprocessing, training recipe
+# and post-processing (teammate_pipeline_20261013/ABC2027_best_pipeline.md):
+#
+#   preprocessing   z-score from each training recording's longest span without crossfade; z-CIR +
+#                   valid as the image, Amir's 4 physics features per radar (raw-frame motion,
+#                   profile steps at 0.2 / 1 / 3 s) added to each frame's tokens; 16 s windows
+#   labels          binary; every labelled fall (flagged included) is a fall, but +-0.2 s around
+#                   every boundary and flagged falls +-2 s get loss weight 0
+#   sampler         complete windows every 2 s; batches of 16 fall + 16 no-fall slots, source- and
+#                   subject-balanced, 4 of the no-fall slots from the Autre recordings; no augmentation
+#   recipe          AdamW 1e-3 constant, weight decay 1e-4, 30 epochs, float32; the final model is the
+#                   mean of the weights of epochs 11-30 (checkpoints/swa.ckpt)
+#   inference       16 s windows every 2 s, probabilities merged with triangular centre weights
+#   post-processing threshold .3, the official labeller on the detected source recording with raw-frame
+#                   motion, merge, NMS 5.9 s, persistence gate
+#
+# This file is the JEPA variant (latent prediction 0.25 + SIGReg 0.1, as U0); the no-JEPA variant is
+# the overlay configs/uwb/ablations/noJEPA.yaml (as A1). Both, 3 seeds each:
+#
+#   BASE=configs/uwb/AP.yaml GROUP=UWB/AP CKPT=swa SEEDS="0 1 2" RELEASE=... tools/run_ablations.sh JEPA noJEPA
+
+seed_everything: 0
+
+run:
+  project: abc2027-fall-jepa
+  group: UWB/AP
+  name: AP
+  notes: >-
+    FallJEPA (d 64, ~290k parameters) with Amir's preprocessing, balanced sampler with hard negatives,
+    constant-LR recipe with SWA over epochs 11-30, and Amir's post-processing.
+  tags: [uwb, frame, amir]
+  wandb: offline
+
+trainer:
+  max_epochs: 30                  # 345 steps an epoch
+  accelerator: auto
+  devices: 1
+  precision: 32-true
+  gradient_clip_val: 1.0
+  gradient_clip_algorithm: norm
+  num_sanity_val_steps: 0
+  log_every_n_steps: 20
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 10, bn_batches: 50}   # epochs 11-30 (1-based), Amir's window
+
+checkpoint:
+  monitor: val/event/F1_mean
+  mode: max
+
+data:
+  release: DATA/abc2027_uwb_train_v1
+  stats_path: runs/_cache/normalizer_interior.json
+  normalizer: interior
+  train_splits: [train]
+  val_splits: [val]
+  test_splits: [val]
+  window_s: 16.0                  # 800 timesteps = 200 frames
+  train_hop_s: 2.0                # the grid of training windows (complete windows only)
+  infer_hop_s: 2.0                # 8 windows per timestep
+  infer_tail: pad
+  train_sampler: balanced
+  sampler:
+    fall_slots: 16
+    hard_slots: 4
+    hard_label: Autre
+    groups: configs/folds/stage04_source_folds.csv   # subject groups (Stage04 folds)
+  frame_width: 32
+  frame_stride: 4
+  diff_channel: false             # motion comes from the physics features (raw-frame motion)
+  physics: true
+  num_states: 2
+  boundary_s: 0.3                 # unused with 2 states
+  boundary_mask_s: 0.2
+  flagged_weight: 0.0
+  flagged_margin_s: 2.0
+  augment: {}
+  batch_size: 32
+  eval_batch_size: 32
+  num_workers: 8
+
+model:
+  model:
+    class_path: falljepa.model.FallJEPA
+    init_args:
+      d_model: 64
+      nhead: 4
+      mlp_ratio: 2                # feed-forward 128, as Amir's blocks
+      pre_proj_ratio: 2
+      frame_patch_size: [23, 8]
+      frame_pooling: cls
+      frame_encoder_layers: 2
+      context_layers: 2
+      bidir_layers: 2
+      predictor_layers: 2
+      pred_horizons: [8]
+      detach_target: true
+      num_states: 2
+      dropout: 0.1
+
+  losses:
+    State_Frame:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: frame_logits, target_key: frame_state, weight_key: frame_weight,
+                  class_weights: [1.0, 1.0]}     # plain per-frame BCE, as Amir
+    State_Step:
+      class_path: falljepa.loss.StateCELoss
+      init_args: {logits_key: step_logits_flat, target_key: step_state, weight_key: step_weight,
+                  class_weights: [1.0, 1.0]}
+    MSE_Latent:
+      class_path: falljepa.loss.MSELoss
+      init_args: {pred_key: z_v_pred, target_key: z_v_target}
+    SIGReg:
+      class_path: falljepa.loss.SIGRegLoss
+      init_args: {latent_key: z_v_proj, batch_size: 32}
+
+  loss_weights:
+    State_Frame: 1.0
+    State_Step: 0.5
+    MSE_Latent: 0.25
+    SIGReg: 0.1
+
+  decoder:
+    kind: amir
+    theta: 0.3
+    gate: true
+    per_recording: false
+  window_weight: triangular
+  window_merge: prob
+  decode_every_n_epochs: 1
+  ignore_flagged: true
+
+  optimizer:
+    class_path: falljepa.optimizer.AdamWConstant
+    init_args:
+      learning_rate: 1.0e-3
+      weight_decay: 1.0e-4

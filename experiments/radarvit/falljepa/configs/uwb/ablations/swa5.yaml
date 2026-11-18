@@ -1,0 +1,10 @@
+# swa5: weight averaging over epochs 6-30 (25 snapshots) instead of 11-30; stack on rdrop
+# (rdrop+swa5). Why: the train frame loss is ~0.001-0.005 by epoch 5 and the errors that remain vary
+# from seed to seed, so more snapshots from the flat part of training should cut variance (SWAD,
+# Cha et al. 2021, averages densely from early on for the same reason).
+run:
+  notes: "AP with weight averaging over epochs 6-30."
+trainer:
+  callbacks:
+    - class_path: falljepa.callbacks.WeightAveraging
+      init_args: {start_epoch: 5, bn_batches: 50}

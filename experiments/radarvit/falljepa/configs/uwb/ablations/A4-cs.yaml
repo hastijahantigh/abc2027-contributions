@@ -1,0 +1,18 @@
+# A4-cs: A4a with ActionFormer's center sampling: only the central half of each fall regresses its
+# boundaries (timesteps near a boundary see little of the other side).
+run:
+  notes: "A4-cs: A4a with center sampling (central 50 % of each fall regressed)."
+data:
+  regress_center: 0.5
+model:
+  model:
+    init_args:
+      regression: true
+  losses:
+    Boundary:
+      class_path: falljepa.loss.BoundaryDIoULoss
+      init_args: {pred_key: bound_pred, target_key: bound_target, weight_key: bound_weight}
+  loss_weights:
+    Boundary: 1.0
+  decoder:
+    refine: true

@@ -1,0 +1,7 @@
+{
+  "seconds": 2.3291692470083944,
+  "input_frames": 800,
+  "retained_core_frames": 292,
+  "inference_hop": 292,
+  "proposals": 2082
+}

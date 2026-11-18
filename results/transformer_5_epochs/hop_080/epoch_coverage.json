@@ -1,0 +1,62 @@
+[
+  {
+    "epoch": 1,
+    "samples_seen": 13888,
+    "unique_windows_seen": 13888,
+    "expected_windows": 13888,
+    "every_window_seen_exactly_once": true,
+    "order_sha256": "5516227b3addcf06019b0cef26748d84e1b6697946b585ef0f60997af047b6c2",
+    "mean_loss_per_sample": 0.2418062301908957,
+    "positive_valid_frames": 66332,
+    "valid_frames": 3876146,
+    "seconds": 50.85411286999806
+  },
+  {
+    "epoch": 2,
+    "samples_seen": 13888,
+    "unique_windows_seen": 13888,
+    "expected_windows": 13888,
+    "every_window_seen_exactly_once": true,
+    "order_sha256": "8904cfe83f9f771a5df2c445f58fb22a19ef68a7a49d555185a9359272d5bc72",
+    "mean_loss_per_sample": 0.1809252174808214,
+    "positive_valid_frames": 66332,
+    "valid_frames": 3876146,
+    "seconds": 50.272942683997826
+  },
+  {
+    "epoch": 3,
+    "samples_seen": 13888,
+    "unique_windows_seen": 13888,
+    "expected_windows": 13888,
+    "every_window_seen_exactly_once": true,
+    "order_sha256": "f9be6b1f63522ca1b154e78a2d9d63f2b29f59cbb54e4fe2c1994b2b387d8f0c",
+    "mean_loss_per_sample": 0.13258860865663505,
+    "positive_valid_frames": 66332,
+    "valid_frames": 3876146,
+    "seconds": 51.00452751099874
+  },
+  {
+    "epoch": 4,
+    "samples_seen": 13888,
+    "unique_windows_seen": 13888,
+    "expected_windows": 13888,
+    "every_window_seen_exactly_once": true,
+    "order_sha256": "a0e35710ef0bc3b6fecfba90ff9e6c81e534e40eb01c1d79cfb31e51a8f1bdfc",
+    "mean_loss_per_sample": 0.1159454024597707,
+    "positive_valid_frames": 66332,
+    "valid_frames": 3876146,
+    "seconds": 50.420371061998594
+  },
+  {
+    "epoch": 5,
+    "samples_seen": 13888,
+    "unique_windows_seen": 13888,
+    "expected_windows": 13888,
+    "every_window_seen_exactly_once": true,
+    "order_sha256": "e103957b489c61100f2d71e7947b4ec9d269d9c95e162eb4c5870cb684fb6722",
+    "mean_loss_per_sample": 0.10076386853301747,
+    "positive_valid_frames": 66332,
+    "valid_frames": 3876146,
+    "seconds": 50.088403451001795
+  }
+]

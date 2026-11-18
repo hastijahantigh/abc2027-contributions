@@ -1,0 +1,13 @@
+{
+  "checkpoint": "hop_080/epoch_005/last.pt",
+  "run_directory": "hop_080/epoch_005",
+  "epoch": 5,
+  "score_threshold": 0.51,
+  "nms_threshold": 0.1,
+  "ranking_score": {
+    "f1_mean": 0.8059701492537313,
+    "start_error_median_abs": 0.4180161178111632,
+    "false_alarms_per_hour": 5.368909135280241
+  },
+  "selection": "Original decoder on validation; signal postprocessing not included."
+}

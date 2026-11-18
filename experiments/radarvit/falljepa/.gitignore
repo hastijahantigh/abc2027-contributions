@@ -1,0 +1,15 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Runs (checkpoints, logs, W&B files) and caches
+runs/
+wandb/
+.DS_Store

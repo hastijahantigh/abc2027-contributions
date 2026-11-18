@@ -1,0 +1,238 @@
+{
+  "train_streams": 13,
+  "validation_streams": 5,
+  "eligible_training_events": 186,
+  "streams": [
+    {
+      "stream_id": "train_00",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_00.h5",
+      "shape": [
+        3,
+        88117,
+        368
+      ],
+      "bytes": 398155628,
+      "mtime_ns": 1790703722000000000,
+      "duration_s": 1762.34
+    },
+    {
+      "stream_id": "train_01",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_01.h5",
+      "shape": [
+        3,
+        88147,
+        368
+      ],
+      "bytes": 398155868,
+      "mtime_ns": 1790703726000000000,
+      "duration_s": 1762.94
+    },
+    {
+      "stream_id": "train_02",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_02.h5",
+      "shape": [
+        3,
+        85923,
+        368
+      ],
+      "bytes": 398138076,
+      "mtime_ns": 1790703728000000000,
+      "duration_s": 1718.46
+    },
+    {
+      "stream_id": "train_03",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_03.h5",
+      "shape": [
+        3,
+        88085,
+        368
+      ],
+      "bytes": 398155372,
+      "mtime_ns": 1790703730000000000,
+      "duration_s": 1761.7
+    },
+    {
+      "stream_id": "train_04",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_04.h5",
+      "shape": [
+        3,
+        88243,
+        368
+      ],
+      "bytes": 398156636,
+      "mtime_ns": 1790703734000000000,
+      "duration_s": 1764.86
+    },
+    {
+      "stream_id": "train_05",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_05.h5",
+      "shape": [
+        3,
+        88327,
+        368
+      ],
+      "bytes": 398157308,
+      "mtime_ns": 1790703736000000000,
+      "duration_s": 1766.54
+    },
+    {
+      "stream_id": "train_06",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_06.h5",
+      "shape": [
+        3,
+        88356,
+        368
+      ],
+      "bytes": 398157540,
+      "mtime_ns": 1790703740000000000,
+      "duration_s": 1767.12
+    },
+    {
+      "stream_id": "train_07",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_07.h5",
+      "shape": [
+        3,
+        88311,
+        368
+      ],
+      "bytes": 398157180,
+      "mtime_ns": 1790703742000000000,
+      "duration_s": 1766.22
+    },
+    {
+      "stream_id": "train_08",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_08.h5",
+      "shape": [
+        3,
+        88371,
+        368
+      ],
+      "bytes": 398157660,
+      "mtime_ns": 1790703748000000000,
+      "duration_s": 1767.42
+    },
+    {
+      "stream_id": "train_09",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_09.h5",
+      "shape": [
+        3,
+        88103,
+        368
+      ],
+      "bytes": 398155516,
+      "mtime_ns": 1790703750000000000,
+      "duration_s": 1762.06
+    },
+    {
+      "stream_id": "train_10",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_10.h5",
+      "shape": [
+        3,
+        88014,
+        368
+      ],
+      "bytes": 398154804,
+      "mtime_ns": 1790703752000000000,
+      "duration_s": 1760.28
+    },
+    {
+      "stream_id": "train_11",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_11.h5",
+      "shape": [
+        3,
+        87941,
+        368
+      ],
+      "bytes": 398154220,
+      "mtime_ns": 1790703756000000000,
+      "duration_s": 1758.82
+    },
+    {
+      "stream_id": "train_12",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/train/stream_12.h5",
+      "shape": [
+        3,
+        56797,
+        368
+      ],
+      "bytes": 265425068,
+      "mtime_ns": 1790703758000000000,
+      "duration_s": 1135.94
+    },
+    {
+      "stream_id": "val_00",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/val/stream_00.h5",
+      "shape": [
+        3,
+        88189,
+        368
+      ],
+      "bytes": 398156204,
+      "mtime_ns": 1790703760000000000,
+      "duration_s": 1763.78
+    },
+    {
+      "stream_id": "val_01",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/val/stream_01.h5",
+      "shape": [
+        3,
+        88421,
+        368
+      ],
+      "bytes": 398158060,
+      "mtime_ns": 1790703764000000000,
+      "duration_s": 1768.42
+    },
+    {
+      "stream_id": "val_02",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/val/stream_02.h5",
+      "shape": [
+        3,
+        88084,
+        368
+      ],
+      "bytes": 398155364,
+      "mtime_ns": 1790703766000000000,
+      "duration_s": 1761.68
+    },
+    {
+      "stream_id": "val_03",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/val/stream_03.h5",
+      "shape": [
+        3,
+        88526,
+        368
+      ],
+      "bytes": 398158900,
+      "mtime_ns": 1790703768000000000,
+      "duration_s": 1770.52
+    },
+    {
+      "stream_id": "val_04",
+      "path": "/home/abc2027/dataset/abc2027_uwb_train_v1/streams/val/stream_04.h5",
+      "shape": [
+        3,
+        15570,
+        368
+      ],
+      "bytes": 88455252,
+      "mtime_ns": 1790703770000000000,
+      "duration_s": 311.4
+    }
+  ],
+  "window_plans": [
+    {
+      "hop_frames": 80,
+      "hop_seconds": 1.6,
+      "input_overlap_fraction": 0.9,
+      "training_windows": 13888,
+      "positive_windows": 891,
+      "background_windows": 12997,
+      "positive_reference_fraction": 0.017112874489247826,
+      "steps_per_full_epoch": 3472,
+      "full_epochs": 5,
+      "total_training_draws": 69440,
+      "total_training_batches": 17360
+    }
+  ]
+}

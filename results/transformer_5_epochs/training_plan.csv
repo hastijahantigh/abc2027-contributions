@@ -1,0 +1,2 @@
+hop_frames,hop_seconds,input_overlap_fraction,training_windows,positive_windows,background_windows,positive_reference_fraction,steps_per_full_epoch,full_epochs,total_training_draws,total_training_batches
+80,1.6,0.9,13888,891,12997,0.017112874489247826,3472,5,69440,17360

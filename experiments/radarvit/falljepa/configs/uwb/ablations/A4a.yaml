@@ -1,0 +1,19 @@
+# A4a: boundary regression combined with the 4 states (ActionFormer's head next to the state head).
+# Every timestep inside a fall regresses its distances to the fall's start and end (1D DIoU loss).
+# Decoding: Viterbi runs as before, then each run's start and end are the P(fall)-weighted medians
+# of its timesteps' regressed start and end (decoder.refine). The probs file keeps the regressed
+# bounds, so the same checkpoint can be decoded without refine (A4a-aux) afterwards.
+run:
+  notes: "A4a: 4 states + boundary regression head; Viterbi runs refined by the regressed boundaries."
+model:
+  model:
+    init_args:
+      regression: true
+  losses:
+    Boundary:
+      class_path: falljepa.loss.BoundaryDIoULoss
+      init_args: {pred_key: bound_pred, target_key: bound_target, weight_key: bound_weight}
+  loss_weights:
+    Boundary: 1.0
+  decoder:
+    refine: true

@@ -1,0 +1,28 @@
+# A4b: the ActionFormer formulation replaces the 4 states: binary fall / no-fall (as A3) + boundary
+# regression, decoded by proposals: every 5th timestep (0.1 s) with P(fall) > 0.5 proposes its
+# regressed [start, end]; greedy NMS at tIoU 0.3 keeps one per fall; score = mean P(fall) over it.
+# The decoder settings are fixed here, not tuned on val.
+run:
+  notes: "A4b: binary labels + boundary regression, ActionFormer-style proposals + NMS decoding."
+data:
+  num_states: 2
+model:
+  model:
+    init_args:
+      num_states: 2
+      regression: true
+  losses:
+    State_Frame:
+      init_args: {class_weights: [1.0, 3.0]}
+    State_Step:
+      init_args: {class_weights: [1.0, 3.0]}
+    Boundary:
+      class_path: falljepa.loss.BoundaryDIoULoss
+      init_args: {pred_key: bound_pred, target_key: bound_target, weight_key: bound_weight}
+  loss_weights:
+    Boundary: 1.0
+  decoder:
+    kind: proposals
+    proposal_threshold: 0.5
+    proposal_stride: 5
+    nms_iou: 0.3

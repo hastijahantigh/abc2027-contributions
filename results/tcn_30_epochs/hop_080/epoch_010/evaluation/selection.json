@@ -1,0 +1,11 @@
+{
+  "fixed": {
+    "score": 0.8,
+    "nms": 0.1
+  },
+  "tuned": {
+    "score": 0.88,
+    "nms": 0.1
+  },
+  "note": "Tuned using validation labels; development results, not held-out test estimates. Equal official keys keep the first setting."
+}

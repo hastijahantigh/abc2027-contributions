@@ -1,0 +1,10 @@
+# adlneg: the AP base with 2 of the 12 plain no-fall slots of each batch drawn from ADL windows whose
+# centre lies at most 4 s after the join into the activity recording. Why: 26 of 51 false alarms of
+# the 6 AP SWA runs are in activity clips, most starting within 3 s of a join; the hard slots only
+# draw Autre.
+run:
+  notes: "AP + 2 no-fall slots per batch from ADL windows just after a join (<= 4 s)."
+data:
+  sampler:
+    join_slots: 2
+    join_s: 4.0

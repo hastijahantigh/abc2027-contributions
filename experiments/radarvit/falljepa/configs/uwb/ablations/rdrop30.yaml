@@ -1,0 +1,9 @@
+# rdrop30: radar dropout at p 0.3 instead of 0.15 (use alone, it replaces rdrop). Why: rdrop was the
+# only AP2 gain (+0.013, both seeds, fewer false alarms), and a fall changes mainly one radar (profile-
+# step share 0.99 on the strongest radar, 0.50 at a join), so forcing single-radar evidence harder may
+# also recover the P2_8 Chute04 falls that the early-fused model misses on some seeds.
+run:
+  notes: "AP + radar dropout 0.3 (CIR and physics features of one radar zeroed)."
+data:
+  augment:
+    radar_drop_p: 0.3

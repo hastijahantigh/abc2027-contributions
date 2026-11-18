@@ -1,0 +1,17 @@
+# A3: a binary fall / no-fall label instead of the 4 states (no begin/end bands). The decoder's
+# grammar becomes none <-> fall with the same switch penalty. Class weight 3 on fall is about the
+# mean weight U0 puts on begin/middle/end, so falls weigh as much in total.
+# data.num_states and the model's num_states must match (both are set here).
+run:
+  notes: "A3: binary fall / no-fall labels instead of none/begin/middle/end."
+data:
+  num_states: 2
+model:
+  model:
+    init_args:
+      num_states: 2
+  losses:
+    State_Frame:
+      init_args: {class_weights: [1.0, 3.0]}
+    State_Step:
+      init_args: {class_weights: [1.0, 3.0]}

@@ -1,0 +1,24 @@
+{
+  "status": "COMPLETE",
+  "recovery": "Report assembly only",
+  "source_run": "/home/abc2027/hasti/tcn_shared_cv_20261028_143412_233355_396364",
+  "source_evaluation": "/home/abc2027/hasti/tcn_shared_cv_20261028_143412_233355_396364/evaluation_20261028_155631_797536_396364",
+  "protocol_sha256": "f979ec048c55efd853439a8355d120b622516fa6b53471da499070dd815de8e1",
+  "training_jobs": 8,
+  "seeds": [
+    2027,
+    2028
+  ],
+  "folds": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "metric_rows": 3816,
+  "all_saved_artifact_hashes_verified": true,
+  "repeated_training": false,
+  "repeated_inference": false,
+  "repeated_postprocessing": false,
+  "finished_utc": "2026-10-28T16:11:19.933809+00:00"
+}

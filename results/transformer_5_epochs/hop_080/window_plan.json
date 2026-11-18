@@ -1,0 +1,123 @@
+{
+  "hop_frames": 80,
+  "hop_seconds": 1.6,
+  "input_window_frames": 800,
+  "input_overlap_fraction": 0.9,
+  "retained_core_overlap_fraction": 0.726027397260274,
+  "training_windows": 13888,
+  "positive_windows": 891,
+  "background_windows": 12997,
+  "valid_reference_exposures_per_epoch": 3876146,
+  "positive_reference_exposures_per_epoch": 66332,
+  "steps_per_full_epoch": 3472,
+  "full_epochs": 5,
+  "total_training_draws": 69440,
+  "total_training_batches": 17360,
+  "streams": [
+    {
+      "stream_id": "train_00",
+      "all_grid_positions": 1102,
+      "wholly_masked_positions_skipped": 0,
+      "training_windows": 1102,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_01",
+      "all_grid_positions": 1102,
+      "wholly_masked_positions_skipped": 2,
+      "training_windows": 1100,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_02",
+      "all_grid_positions": 1075,
+      "wholly_masked_positions_skipped": 4,
+      "training_windows": 1071,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_03",
+      "all_grid_positions": 1102,
+      "wholly_masked_positions_skipped": 3,
+      "training_windows": 1099,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_04",
+      "all_grid_positions": 1104,
+      "wholly_masked_positions_skipped": 2,
+      "training_windows": 1102,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_05",
+      "all_grid_positions": 1105,
+      "wholly_masked_positions_skipped": 4,
+      "training_windows": 1101,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_06",
+      "all_grid_positions": 1105,
+      "wholly_masked_positions_skipped": 4,
+      "training_windows": 1101,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_07",
+      "all_grid_positions": 1104,
+      "wholly_masked_positions_skipped": 1,
+      "training_windows": 1103,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_08",
+      "all_grid_positions": 1105,
+      "wholly_masked_positions_skipped": 1,
+      "training_windows": 1104,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_09",
+      "all_grid_positions": 1102,
+      "wholly_masked_positions_skipped": 1,
+      "training_windows": 1101,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_10",
+      "all_grid_positions": 1101,
+      "wholly_masked_positions_skipped": 2,
+      "training_windows": 1099,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_11",
+      "all_grid_positions": 1100,
+      "wholly_masked_positions_skipped": 1,
+      "training_windows": 1099,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    },
+    {
+      "stream_id": "train_12",
+      "all_grid_positions": 710,
+      "wholly_masked_positions_skipped": 4,
+      "training_windows": 706,
+      "min_valid_reference_coverage": 1,
+      "max_valid_reference_coverage": 4
+    }
+  ],
+  "positive_reference_fraction": 0.017112874489247826
+}

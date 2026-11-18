@@ -1,0 +1,12 @@
+# noJEPA: AP without the JEPA loss and the latent predictor Hv (as A1); SIGReg and the pre-projector
+# stay. Deep-merged onto configs/uwb/AP.yaml by tools/compose_config.py.
+run:
+  notes: "AP without the JEPA objective: no latent predictor Hv, no MSE_Latent; SIGReg stays."
+model:
+  model:
+    init_args:
+      predictor_layers: 0
+  losses:
+    MSE_Latent: __delete__
+  loss_weights:
+    MSE_Latent: __delete__

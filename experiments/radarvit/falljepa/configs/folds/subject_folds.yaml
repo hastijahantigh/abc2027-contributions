@@ -1,0 +1,15 @@
+# Subject-held-out folds over the pooled train + val clips (tools/build_fold_streams.py).
+#
+# A fall subject is the suffix of the session folder (Test_P1_3, Test_P2_3, Test_P3_3 -> 3: one person
+# at the three mat positions; an assumption, not stated by the organizers). An ADL subject is the
+# suffix of the activity file (Boire_5.json -> 5). The two corpora are different people (README v1.1),
+# so each fold holds out two of each, like the test set. Autre/Empty recordings go with their fall
+# subject. Clean (not flagged) falls held out: A 69, B 58, C 59, D 67.
+#
+# D is the official split: its training clips are the official training streams' clips and its
+# held-out clips the official val streams' clips, so the official streams are its first stitching.
+folds:
+  A: {fall: [2, 3], adl: [4, 9]}
+  B: {fall: [1, 7], adl: [5, 12]}
+  C: {fall: [5, 6], adl: [6, 10]}
+  D: {fall: [8, 9], adl: [0, 11], official: true}
